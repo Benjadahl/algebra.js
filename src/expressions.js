@@ -658,16 +658,25 @@ Term.prototype.toString = function(options) {
         var coef = this.coefficients[i];
 
         if (coef.abs().numer !== 1 || coef.abs().denom !== 1) {
-            str += " * " + coef.toString();
+            //If is not last coefficient
+            if (!i === this.coefficients.length - 1) {
+                str += " * " + coef.toString();
+            } else {
+                str += " * " + coef.numer;
+                str = this.variables.reduce(function (p, c) {
+                    if (implicit && !!p) {
+                        var vStr = c.toString();
+                        return !!vStr ? p + "*" + vStr : p;
+                    } else
+                        return p.concat(c.toString());
+                }, str);
+                if (coef.denom !== 1) {
+                    str += "/" + coef.denom;
+                }
+            }
         }
     }
-    str = this.variables.reduce(function (p, c) {
-        if (implicit && !!p) {
-            var vStr = c.toString();
-            return !!vStr ? p + "*" + vStr : p;
-        } else
-            return p.concat(c.toString());
-    }, str);
+
     str = (str.substring(0, 3) === " * " ? str.substring(3, str.length) : str);
     str = (str.substring(0, 1) === "-" ? str.substring(1, str.length) : str);
 
